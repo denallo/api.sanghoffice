@@ -13,9 +13,10 @@ type KutiController struct {
 }
 
 // @router / [get]
-func (o *KutiController) Get() {
-	kutiForSex, _ := strconv.Atoi(o.Ctx.Input.Param("sex"))
-	kuties := models.GetKuties(kutiForSex)
-	o.Data["json"] = kuties
-	o.ServeJSON()
+func (ctrl *KutiController) Get() {
+	kutiForSex, _ := strconv.Atoi(ctrl.Ctx.Input.Param("sex"))
+	retJson := models.GetKuties(kutiForSex)
+	ctrl.Data["json"] = retJson
+	ctrl.Ctx.Output.Header("Access-Control-Allow-Origin", "*")
+	ctrl.ServeJSON()
 }

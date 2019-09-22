@@ -14,7 +14,7 @@ import (
 )
 
 func init() {
-	ns := beego.NewNamespace("/k-manager",
+	ns := beego.NewNamespace("/v1",
 		beego.NSNamespace("/kuties",
 			beego.NSInclude(
 				&controllers.KutiController{},
