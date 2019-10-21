@@ -25,6 +25,11 @@ func init() {
 				&controllers.ResidentController{},
 			),
 		),
+		beego.NSNamespace("/resiStatus",
+			beego.NSInclude(
+				&controllers.ResiStatusCtrl{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }

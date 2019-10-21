@@ -16,9 +16,9 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentController"] = append(beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentController"],
+    beego.GlobalControllerRouter["api.sanghoffice/controllers:ResiStatusCtrl"] = append(beego.GlobalControllerRouter["api.sanghoffice/controllers:ResiStatusCtrl"],
         beego.ControllerComments{
-            Method: "Post",
+            Method: "AddResiStatus",
             Router: `/`,
             AllowHTTPMethods: []string{"post"},
             MethodParams: param.Make(),
@@ -27,54 +27,9 @@ func init() {
 
     beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentController"] = append(beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentController"],
         beego.ControllerComments{
-            Method: "GetAll",
+            Method: "AddResident",
             Router: `/`,
-            AllowHTTPMethods: []string{"get"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
-
-    beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentController"] = append(beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentController"],
-        beego.ControllerComments{
-            Method: "Get",
-            Router: `/:uid`,
-            AllowHTTPMethods: []string{"get"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
-
-    beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentController"] = append(beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentController"],
-        beego.ControllerComments{
-            Method: "Put",
-            Router: `/:uid`,
-            AllowHTTPMethods: []string{"put"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
-
-    beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentController"] = append(beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentController"],
-        beego.ControllerComments{
-            Method: "Delete",
-            Router: `/:uid`,
-            AllowHTTPMethods: []string{"delete"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
-
-    beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentController"] = append(beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentController"],
-        beego.ControllerComments{
-            Method: "Login",
-            Router: `/login`,
-            AllowHTTPMethods: []string{"get"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
-
-    beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentController"] = append(beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentController"],
-        beego.ControllerComments{
-            Method: "Logout",
-            Router: `/logout`,
-            AllowHTTPMethods: []string{"get"},
+            AllowHTTPMethods: []string{"post"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})
