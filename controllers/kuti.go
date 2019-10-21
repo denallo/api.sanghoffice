@@ -17,6 +17,5 @@ func (ctrl *KutiController) Get() {
 	kutiForSex, _ := strconv.Atoi(ctrl.Ctx.Input.Param("sex"))
 	retJson := models.GetKuties(kutiForSex)
 	ctrl.Data["json"] = retJson
-	ctrl.Ctx.Output.Header("Access-Control-Allow-Origin", "*")
 	ctrl.ServeJSON()
 }
