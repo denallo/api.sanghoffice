@@ -38,6 +38,7 @@ type Resident struct {
 }
 
 const (
+	R_TYPE_MONK_UNCERTAIN = 100 // 出家众,未确认具体类型
 	R_TYPE_BHIKHU      = 0
 	R_TYPE_SAMANERA    = 1
 	R_TYPE_SAYALAY     = 2
