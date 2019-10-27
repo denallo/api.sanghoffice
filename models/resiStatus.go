@@ -15,3 +15,24 @@ type ReqNewResiStatus struct {
 	Phone                 string `json:"phone"`
 	Sex                   int    `json:"sex"`
 }
+
+func AddResiStatus(residentID int, sex int, kutiNumber int, kutiType int, arriveDate string, leaveDate string) bool {
+	kuti := Kuti{Number: kutiNumber, ForSex: sex, Type: kutiType}
+	err := o.Read(&kuti, "number", "for_sex", "type")
+	if err != nil {
+		println(err.Error())
+		return false
+	}
+	resiStatus := ResiStatus{
+		ResidentId:      residentID,
+		KutiId:          kuti.Id,
+		ArriveDate:      arriveDate,
+		PlanToLeaveDate: leaveDate,
+	}
+	_, error := o.Insert(&resiStatus)
+	if error != nil {
+		println(error.Error())
+		return false
+	}
+	return true
+}

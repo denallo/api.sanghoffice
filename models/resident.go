@@ -1,86 +1,64 @@
 package models
 
 import (
-	"errors"
-	"strconv"
-	"time"
+	"api.sanghoffice/tools"
+	"github.com/astaxie/beego/orm"
 )
 
-var (
-	UserList map[string]*User
-)
-
-func init() {
-	UserList = make(map[string]*User)
-	u := User{"user_11111", "astaxie", "11111", Profile{"male", 20, "Singapore", "astaxie@gmail.com"}}
-	UserList["user_11111"] = &u
-}
-
-type User struct {
-	Id       string
-	Username string
-	Password string
-	Profile  Profile
-}
-
-type Profile struct {
-	Gender  string
-	Age     int
-	Address string
-	Email   string
-}
-
-func AddUser(u User) string {
-	u.Id = "user_" + strconv.FormatInt(time.Now().UnixNano(), 10)
-	UserList[u.Id] = &u
-	return u.Id
-}
-
-func GetUser(uid string) (u *User, err error) {
-	if u, ok := UserList[uid]; ok {
-		return u, nil
+func IsExistedResident(name string, isDhamame bool, sex int) (existed bool, residentID int) {
+	var resident Resident
+	key := ""
+	if isDhamame {
+		resident.Dhamame = name
+		key = "dhamame"
+	} else {
+		resident.Name = name
+		key = "name"
 	}
-	return nil, errors.New("User not exists")
-}
-
-func GetAllUsers() map[string]*User {
-	return UserList
-}
-
-func UpdateUser(uid string, uu *User) (a *User, err error) {
-	if u, ok := UserList[uid]; ok {
-		if uu.Username != "" {
-			u.Username = uu.Username
-		}
-		if uu.Password != "" {
-			u.Password = uu.Password
-		}
-		if uu.Profile.Age != 0 {
-			u.Profile.Age = uu.Profile.Age
-		}
-		if uu.Profile.Address != "" {
-			u.Profile.Address = uu.Profile.Address
-		}
-		if uu.Profile.Gender != "" {
-			u.Profile.Gender = uu.Profile.Gender
-		}
-		if uu.Profile.Email != "" {
-			u.Profile.Email = uu.Profile.Email
-		}
-		return u, nil
+	resident.Sex = sex
+	if orm.ErrNoRows == o.Read(&resident, key) {
+		existed = false
+	} else {
+		existed = true
+		residentID = resident.Id
 	}
-	return nil, errors.New("User Not Exist")
+	return existed, residentID
 }
 
-func Login(username, password string) bool {
-	for _, u := range UserList {
-		if u.Username == username && u.Password == password {
-			return true
+func AddResident(data map[string]interface{}) (residentID int) {
+	resident := Resident{}
+	for key, value := range data {
+		if key == "name" {
+			resident.Name = value.(string)
+		} else if key == "dhamame" {
+			resident.Dhamame = value.(string)
+		} else if key == "sex" {
+			resident.Sex, _ = tools.JsonNumberToInt(value)
+		} else if key == "identifier" {
+			resident.Identifier = value.(string)
+		} else if key == "age" {
+			resident.Age, _ = tools.JsonNumberToInt(value)
+		} else if key == "type" {
+			resident.Type, _ = tools.JsonNumberToInt(value)
+		} else if key == "folk" {
+			resident.Folk = value.(string)
+		} else if key == "native_place" {
+			resident.NativePlace = value.(string)
+		} else if key == "ability" {
+			resident.Ability = value.(string)
+		} else if key == "phone" {
+			resident.Phone = value.(string)
+		} else if key == "emergency_contact" {
+			resident.EmergencyContact = value.(string)
+		} else if key == "emergency_contact_phone" {
+			resident.EmergencyContactPhone = value.(string)
 		}
 	}
-	return false
-}
-
-func DeleteUser(uid string) {
-	delete(UserList, uid)
+	id, err := o.Insert(&resident)
+	if err != nil {
+		println(err)
+		return -1
+	}
+	residentID = int(id)
+	return residentID
 }

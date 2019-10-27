@@ -16,6 +16,15 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["api.sanghoffice/controllers:KutiController"] = append(beego.GlobalControllerRouter["api.sanghoffice/controllers:KutiController"],
+        beego.ControllerComments{
+            Method: "UpdateBrokenStatus",
+            Router: `/status`,
+            AllowHTTPMethods: []string{"patch"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
     beego.GlobalControllerRouter["api.sanghoffice/controllers:ResiStatusCtrl"] = append(beego.GlobalControllerRouter["api.sanghoffice/controllers:ResiStatusCtrl"],
         beego.ControllerComments{
             Method: "AddResiStatus",

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
@@ -115,14 +116,14 @@ func GetKuties(forSex int) map[string]interface{} {
 	retJson := map[string]interface{}{}
 	// 孤邸属性
 	mapKuties := map[int]*Kuti{}
-	var kuties []*Kuti
+	var kuties []*Kuti // 按类型、孤邸号排序
 	query := o.QueryTable("tb_kuti").Filter("for_sex", forSex).OrderBy("type", "number")
 	num, err := query.All(&kuties)
 	if nil != err {
 		panic(err)
 	}
-	typeLeader := []int{} // 每种类型孤邸的第一个的索引
-	groupCount := []int{}
+	typeLeader := []int{} // kuties数组中每种类型第一个孤邸的索引
+	groupCount := []int{} // 每种类型的孤邸数量
 	lastType := -1
 	cnt := 0
 	for i := 0; i < int(num); i++ {
@@ -175,6 +176,8 @@ func GetKuties(forSex int) map[string]interface{} {
 		jsonKutiInfo := map[string]interface{}{}
 		jsonKutiInfo["kutiNumber"] = kutiInfo.Number
 		jsonKutiInfo["type"] = kutiInfo.Type
+		jsonKutiInfo["forSex"] = kutiInfo.ForSex
+		jsonKutiInfo["broken"] = kutiInfo.Broken
 		var listEnagedStatus []([2]string) // [(arriveDate, leaveDate), ...]
 		var listResidentsInfo [](map[string]interface{})
 		for j := 0; j < len(mapKuti2Status[kutiInfo.Id]); j++ { // 某孤邸入住的所有人员
@@ -190,21 +193,26 @@ func GetKuties(forSex int) map[string]interface{} {
 			listEnagedStatus = append(listEnagedStatus, enagedStatus)
 			// 人员信息
 			residentInfo["id"] = resident.Id
+			residentInfo["dhamame"] = resident.Dhamame
+			residentInfo["name"] = resident.Name
 			if R_TYPE_BHIKHU == resident.Type ||
 				R_TYPE_SAMANERA == resident.Type ||
 				R_TYPE_SAYALAY == resident.Type ||
 				R_TYPE_OTHER_MONK == resident.Type {
-				if resident.Dhamame != "" {
-					residentInfo["name"] = resident.Dhamame
-				} else {
-					residentInfo["name"] = resident.Name
-				}
+				// if resident.Dhamame != "" {
+				// 	residentInfo["name"] = resident.Dhamame
+				// } else {
+				// 	residentInfo["name"] = resident.Name
+				// }
 				residentInfo["isMonk"] = 1
 			} else {
-				residentInfo["name"] = resident.Name
+				// residentInfo["name"] = resident.Name
 				residentInfo["isMonk"] = 0
 			}
 			residentInfo["leaveDate"] = resiStatus.PlanToLeaveDate
+			if residentInfo["leaveDate"] == "" {
+				residentInfo["leaveDate"] = "常住人员"
+			}
 			residentInfo["arriveDate"] = resiStatus.ArriveDate
 			listResidentsInfo = append(listResidentsInfo, residentInfo)
 		}
@@ -280,4 +288,24 @@ func GetKuties(forSex int) map[string]interface{} {
 	}
 	retJson["eventsToConfirm"] = arrayToConfirmed
 	return retJson
+}
+
+func UpdateBrokenStatus(kutiNumber int, kutiType int, forSex int, brokenStatus int) bool {
+	qs := o.QueryTable("tb_kuti").
+		Filter("number", kutiNumber).
+		Filter("type", kutiType).
+		Filter("for_sex", forSex)
+	var kuti Kuti
+	err := qs.One(&kuti)
+	if nil != err {
+		println(err.Error())
+		return false
+	}
+	kuti.Broken = brokenStatus
+	cnt, error := o.Update(&kuti, "broken")
+	if nil != error {
+		println(error.Error())
+	}
+	println(fmt.Sprintf("effected row: %d", cnt))
+	return true
 }
