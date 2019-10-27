@@ -12,9 +12,10 @@ var o orm.Ormer
 
 type Kuti struct {
 	Id     int `orm:"column(id)"`
-	Type   int `orm:"column(type)"`
 	Number int `orm:"column(number)"`
+	Type   int `orm:"column(type)"`
 	ForSex int `orm:"column(for_sex)"`
+	Broken int `orm:"column(broken)"` // 0-正常 1-损坏
 }
 
 func (tb *Kuti) TableName() string {
@@ -23,29 +24,29 @@ func (tb *Kuti) TableName() string {
 
 type Resident struct {
 	Id                    int    `orm:"column(id)"`
-	Ability               string `orm:"column(ability)"`
-	Age                   int    `orm:"column(age)"`
+	Name                  string `orm:"column(name)"`
 	Dhamame               string `orm:"column(dhamame)"`
+	Sex                   int    `orm:"column(sex)"`
+	Identifier            string `orm:"column(identifier)"`
+	Age                   int    `orm:"column(age)"`
+	Type                  int    `orm:"column(type)"`
+	Folk                  string `orm:"column(folk)"`
+	NativePlace           string `orm:"column(native_place)"`
+	Ability               string `orm:"column(ability)"`
+	Phone                 string `orm:"column(phone)"`
 	EmergencyContact      string `orm:"column(emergency_contact)"`
 	EmergencyContactPhone string `orm:"column(emergency_contact_phone)"`
-	Folk                  string `orm:"column(folk)"`
-	Identifier            string `orm:"column(identifier)"`
-	Name                  string `orm:"column(name)"`
-	NativePlace           string `orm:"column(native_place)"`
-	Phone                 string `orm:"column(phone)"`
-	Sex                   int    `orm:"column(sex)"`
-	Type                  int    `orm:"column(type)"`
 }
 
 const (
 	R_TYPE_MONK_UNCERTAIN = 100 // 出家众,未确认具体类型
-	R_TYPE_BHIKHU      = 0
-	R_TYPE_SAMANERA    = 1
-	R_TYPE_SAYALAY     = 2
-	R_TYPE_OTHER_MONK  = 3
-	R_TYPE_SERVER      = 4
-	R_TYPE_DHAMWORKER  = 5
-	R_TYPE_OTHER_HOMER = 6
+	R_TYPE_BHIKHU         = 0
+	R_TYPE_SAMANERA       = 1
+	R_TYPE_SAYALAY        = 2
+	R_TYPE_OTHER_MONK     = 3
+	R_TYPE_SERVER         = 4
+	R_TYPE_DHAMWORKER     = 5
+	R_TYPE_OTHER_HOMER    = 6
 )
 
 func (tb *Resident) TableName() string {
@@ -53,13 +54,12 @@ func (tb *Resident) TableName() string {
 }
 
 type ResiStatus struct {
-	Id              int    `orm:"column(id)"`
-	ResidentId      int    `orm:"column(resident_id)"`
+	ResidentId      int    `orm:"column(resident_id);pk"`
 	KutiId          int    `orm:"column(kuti_id)"`
-	TurnedPhoneCard int    `orm:"column(turned_phone_card)"`
 	ArriveDate      string `orm:"column(arrive_date)"`
 	PlanToStayDays  int    `orm:"column(plan_to_stay_days)"`
 	PlanToLeaveDate string `orm:"column(plan_to_leave_date)"`
+	TurnedPhoneCard int    `orm:"column(turned_phone_card)"`
 }
 
 func (tb *ResiStatus) TableName() string {
@@ -239,8 +239,8 @@ func init() {
 	orm.RegisterModel(new(Resident))
 	orm.RegisterModel(new(ResiStatus))
 	orm.RegisterModel(new(ResiHistory))
-	orm.RegisterModel(new(Instance))
-	orm.RegisterModel(new(Relations))
+	// orm.RegisterModel(new(Instance))
+	// orm.RegisterModel(new(Relations))
 	orm.RunSyncdb("default", false, false)
 	o = orm.NewOrm()
 	orm.Debug = true
