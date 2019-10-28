@@ -8,17 +8,6 @@ import (
 	mapset "github.com/deckarep/golang-set"
 )
 
-// func dateSessionToSet(startDate string, endDate string) mapset.Set {
-// 	dateSession := mapset.NewSet()
-// 	for currIndex := startDate; currIndex <= endDate; {
-// 		dateSession.Add(currIndex)
-// 		t, _ := time.Parse("2006-01-02 15:04:05", currIndex)
-// 		after, _ := time.ParseDuration("24h")
-// 		currIndex = t.Add(after).Format("2006-01-02 15:04:05")
-// 	}
-// 	return dateSession
-// }
-
 func calcAvaliables(startDate string, endDate string, arriveDate string, leaveDate string) []int {
 	if arriveDate == "" {
 		arriveDate = "2019-09-01 00:00:00"
@@ -59,18 +48,7 @@ func calcAvaliables(startDate string, endDate string, arriveDate string, leaveDa
 		currIndex = t.Add(after).Format(TIME_LAYOUT)
 	}
 	avaliableDates := dateSession.Difference(engagedSession)
-	// currDate := time.Now().Format(TIME_LAYOUT)
 	for i := 0; i < len(dateSessionArray); i++ {
-		// var status int // 0-空闲 1-已预约 2-入住中 3-过去日期
-		// if dateSessionArray[i] < currDate {
-		// 	status = 3
-		// } else if avaliableDates.Contains(dateSessionArray[i]) {
-		// 	status = 0
-		// } else if arriveDate > currDate {
-		// 	status = 1
-		// } else {
-		// 	status = 2
-		// }
 		var status int // 0-空闲 1-有人
 		if avaliableDates.Contains(dateSessionArray[i]) {
 			status = 0

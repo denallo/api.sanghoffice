@@ -1,5 +1,7 @@
 package models
 
+import "strconv"
+
 type ReqNewResiStatus struct {
 	ArriveDate            string `json:"arriveDate"`
 	LeaveDate             string `json:"leaveDate"`
@@ -35,4 +37,62 @@ func AddResiStatus(residentID int, sex int, kutiNumber int, kutiType int, arrive
 		return false
 	}
 	return true
+}
+
+func GetAvailablesInfo(kutiNumber int, kutiType int, forSex int) ([]([]int), bool) {
+	kuti := Kuti{Number: kutiNumber, ForSex: forSex, Type: kutiType}
+	error := o.Read(&kuti, "number", "for_sex", "type")
+	if nil != error {
+		println(error.Error())
+		return nil, false
+	}
+	kutiID := kuti.Id
+
+	resiStatusList := []*ResiStatus{}
+	query := o.QueryTable("tb_resi_status").Filter("kuti_id", kutiID)
+	cnt, err := query.All(&resiStatusList)
+	if nil != err {
+		println(err.Error())
+		return nil, false
+	}
+
+	var listEnagedStatus []([2]string) // [(arriveDate, leaveDate), ...]
+	for i := 0; i < int(cnt); i++ {
+		resiStatus := resiStatusList[i]
+		enagedInfo := [2]string{resiStatus.ArriveDate, resiStatus.PlanToLeaveDate}
+		listEnagedStatus = append(listEnagedStatus, enagedInfo)
+	}
+
+	dateSessions := getDateSessions()
+	var avaliables []([]int)
+	for index := 0; index < len(dateSessions); index++ {
+		var avaliableUnmerged []([]int) // 用于合并一栋孤邸多个住众在同一天的入住状态
+		var avaliableMerged []int
+		startDate := dateSessions[index][0]
+		endDate := dateSessions[index][1]
+		for sub_index := 0; sub_index < len(listEnagedStatus); sub_index++ {
+			arriveDate := listEnagedStatus[sub_index][0]
+			leaveDate := listEnagedStatus[sub_index][1]
+			avaliableSingle := calcAvaliables(startDate, endDate, arriveDate, leaveDate)
+			avaliableUnmerged = append(avaliableUnmerged, avaliableSingle)
+		}
+		if len(avaliableUnmerged) == 0 {
+			cntDays, _ := strconv.Atoi(endDate[8:10])
+			for idxArray := 0; idxArray < cntDays; idxArray++ {
+				avaliableMerged = append(avaliableMerged, 0)
+			}
+		} else {
+			for idxAvaliablesUnmerged := 0; idxAvaliablesUnmerged < len(avaliableUnmerged[0]); idxAvaliablesUnmerged++ {
+				statusMerged := -100
+				for idx := 0; idx < len(avaliableUnmerged); idx++ {
+					if statusMerged < avaliableUnmerged[idx][idxAvaliablesUnmerged] {
+						statusMerged = avaliableUnmerged[idx][idxAvaliablesUnmerged]
+					}
+				}
+				avaliableMerged = append(avaliableMerged, statusMerged)
+			}
+		}
+		avaliables = append(avaliables, avaliableMerged)
+	}
+	return avaliables, true
 }

@@ -63,6 +63,8 @@ func (this *ResiStatusCtrl) AddResiStatus() {
 	if !success {
 		ReplyError(this, STATUSCODE_EXCEPTIONOCCUR, MESSAGE_EXCEPTIONOCCUR+fmt.Sprintf(""))
 	}
+	var avaliables []([]int)
+	avaliables, success = models.GetAvailablesInfo(kutiNumber, kutiType, sex)
 	retJson := map[string]interface{}{}
 	retJson["residentId"] = residentID
 	retJson["name"] = name
@@ -70,10 +72,10 @@ func (this *ResiStatusCtrl) AddResiStatus() {
 	retJson["arriveDate"] = arriveDate
 	retJson["leaveDate"] = leaveDate
 	retJson["isMonk"] = isMonk
-	retJson["kutiNumber"] = kutiNumber
-	retJson["kutiNumber"] = kutiNumber
-	retJson["kutiType"] = kutiType
+	// retJson["kutiNumber"] = kutiNumber
+	// retJson["kutiType"] = kutiType
 	retJson["kutiIndex"] = kutiIndex
+	retJson["availables"] = avaliables
 	this.Data["json"] = retJson
 	ReplySuccess(this, retJson)
 }
