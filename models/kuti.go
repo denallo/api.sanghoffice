@@ -35,7 +35,7 @@ func calcAvaliables(startDate string, endDate string, arriveDate string, leaveDa
 		currIndex = t.Add(after).Format(TIME_LAYOUT)
 	}
 	engagedSession := mapset.NewSet()
-	for currIndex := arriveDate; currIndex <= leaveDate; {
+	for currIndex := arriveDate; currIndex < leaveDate; {
 		if currIndex < startDate {
 			t, _ := time.Parse(TIME_LAYOUT, currIndex)
 			after, _ := time.ParseDuration("24h")
