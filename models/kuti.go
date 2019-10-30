@@ -8,6 +8,9 @@ import (
 	mapset "github.com/deckarep/golang-set"
 )
 
+const TIME_LAYOUT = "2006-01-02 15:04:05"
+const DATE_LAYOUT = "2006-01-02"
+
 func calcAvaliables(startDate string, endDate string, arriveDate string, leaveDate string) []int {
 	if arriveDate == "" {
 		arriveDate = "2019-09-01 00:00:00"
@@ -21,7 +24,6 @@ func calcAvaliables(startDate string, endDate string, arriveDate string, leaveDa
 	if len(leaveDate) == 10 {
 		leaveDate += " 00:00:00"
 	}
-	const TIME_LAYOUT = "2006-01-02 15:04:05"
 	var avaliable []int
 	dateSession := mapset.NewSet()
 	dateSessionArray := []string{}

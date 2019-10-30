@@ -1,6 +1,10 @@
 package models
 
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+	"time"
+)
 
 type ReqNewResiStatus struct {
 	ArriveDate            string `json:"arriveDate"`
@@ -95,4 +99,40 @@ func GetAvailablesInfo(kutiNumber int, kutiType int, forSex int) ([]([]int), boo
 		avaliables = append(avaliables, avaliableMerged)
 	}
 	return avaliables, true
+}
+
+func CreateItem(residentID int, arriveDate string, leaveDate string) bool {
+	items := []*Item{}
+	query := o.QueryTable("tb_item").Filter("resident_id", residentID).Filter("confirmed", 0)
+	cnt, err := query.All(&items)
+	if err != nil {
+		println(err.Error())
+		return false
+	}
+	for i := 0; i < int(cnt); i++ {
+		item := items[i]
+		var activateDate string
+		switch item.Type {
+		case 0: // 人员于当天离开
+			t, _ := time.Parse(DATE_LAYOUT, leaveDate)
+			before, _ := time.ParseDuration("-72h")
+			activateDate = t.Add(before).Format(DATE_LAYOUT)
+			break
+		case 1: // 已预约人员于当天到达
+			t, _ := time.Parse(DATE_LAYOUT, arriveDate)
+			before, _ := time.ParseDuration("-72h")
+			activateDate = t.Add(before).Format(DATE_LAYOUT)
+			break
+		default:
+			println(fmt.Sprintf("unknow item type: %d", item.Type))
+			return false
+		}
+		item.ActivateDate = activateDate
+		_, err := o.Update(item, "activate_date")
+		if err != nil {
+			println(err.Error())
+			return false
+		}
+	}
+	return true
 }

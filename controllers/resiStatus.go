@@ -63,6 +63,10 @@ func (this *ResiStatusCtrl) AddResiStatus() {
 	if !success {
 		ReplyError(this, STATUSCODE_EXCEPTIONOCCUR, MESSAGE_EXCEPTIONOCCUR+fmt.Sprintf(""))
 	}
+	success = models.CreateItem(residentID, arriveDate, leaveDate)
+	if !success {
+		ReplyError(this, STATUSCODE_EXCEPTIONOCCUR, MESSAGE_EXCEPTIONOCCUR+fmt.Sprintf(""))
+	}
 	var avaliables []([]int)
 	avaliables, success = models.GetAvailablesInfo(kutiNumber, kutiType, sex)
 	retJson := map[string]interface{}{}
