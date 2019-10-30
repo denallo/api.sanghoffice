@@ -30,6 +30,11 @@ func init() {
 				&controllers.ResiStatusCtrl{},
 			),
 		),
+		beego.NSNamespace("/items",
+			beego.NSInclude(
+				&controllers.ItemController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }

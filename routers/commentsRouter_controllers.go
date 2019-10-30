@@ -7,6 +7,15 @@ import (
 
 func init() {
 
+    beego.GlobalControllerRouter["api.sanghoffice/controllers:ItemController"] = append(beego.GlobalControllerRouter["api.sanghoffice/controllers:ItemController"],
+        beego.ControllerComments{
+            Method: "GetBrief",
+            Router: `/`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
     beego.GlobalControllerRouter["api.sanghoffice/controllers:KutiController"] = append(beego.GlobalControllerRouter["api.sanghoffice/controllers:KutiController"],
         beego.ControllerComments{
             Method: "Get",

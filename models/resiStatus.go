@@ -3,7 +3,6 @@ package models
 import (
 	"fmt"
 	"strconv"
-	"time"
 )
 
 type ReqNewResiStatus struct {
@@ -114,14 +113,16 @@ func CreateItem(residentID int, arriveDate string, leaveDate string) bool {
 		var activateDate string
 		switch item.Type {
 		case 0: // 人员于当天离开
-			t, _ := time.Parse(DATE_LAYOUT, leaveDate)
-			before, _ := time.ParseDuration("-72h")
-			activateDate = t.Add(before).Format(DATE_LAYOUT)
+			// t, _ := time.Parse(DATE_LAYOUT, leaveDate)
+			// before, _ := time.ParseDuration("-72h")
+			// activateDate = t.Add(before).Format(DATE_LAYOUT)
+			activateDate = leaveDate
 			break
 		case 1: // 已预约人员于当天到达
-			t, _ := time.Parse(DATE_LAYOUT, arriveDate)
-			before, _ := time.ParseDuration("-72h")
-			activateDate = t.Add(before).Format(DATE_LAYOUT)
+			// t, _ := time.Parse(DATE_LAYOUT, arriveDate)
+			// before, _ := time.ParseDuration("-72h")
+			// activateDate = t.Add(before).Format(DATE_LAYOUT)
+			activateDate = arriveDate
 			break
 		default:
 			println(fmt.Sprintf("unknow item type: %d", item.Type))
