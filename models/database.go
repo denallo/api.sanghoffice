@@ -35,6 +35,17 @@ type Resident struct {
 	EmergencyContactPhone string `orm:"column(emergency_contact_phone)"`
 }
 
+type ResidentInTemple struct {
+	Name       string
+	Dhamame    string
+	Sex        int
+	Type       int
+	KutiNumber int
+	KutiType   int
+	Arrive     string
+	Leave      string
+}
+
 const (
 	R_TYPE_MONK_UNCERTAIN = 100 // 出家众,未确认具体类型
 	R_TYPE_BHIKHU         = 0

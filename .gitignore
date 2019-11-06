@@ -1,3 +1,5 @@
 .vscode
 debug
 lastupdate.tmp
+scripts/delete.sql
+scripts/develop.sql

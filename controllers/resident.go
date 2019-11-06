@@ -1,6 +1,9 @@
 package controllers
 
 import (
+	"fmt"
+
+	"api.sanghoffice/models"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 )
@@ -21,7 +24,14 @@ func (this *ResidentController) PtrData() *map[interface{}]interface{} {
 	return &(this.Data)
 }
 
-// @router / [post]
-func (this *ResidentController) AddResident() {
-
+// @router / [get]
+func (this *ResidentController) GetResidents() {
+	sex, _ := this.GetInt("sex")
+	residents, success := models.GetResidents(sex)
+	if !success {
+		ReplyError(this, STATUSCODE_EXCEPTIONOCCUR, MESSAGE_EXCEPTIONOCCUR+fmt.Sprintf(""))
+	}
+	json := map[string]interface{}{}
+	json["residents"] = residents
+	ReplySuccess(this, json)
 }

@@ -45,9 +45,9 @@ func init() {
 
     beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentController"] = append(beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentController"],
         beego.ControllerComments{
-            Method: "AddResident",
+            Method: "GetResidents",
             Router: `/`,
-            AllowHTTPMethods: []string{"post"},
+            AllowHTTPMethods: []string{"get"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})

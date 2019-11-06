@@ -25,6 +25,15 @@ func IsExistedResident(name string, isDhamame bool, sex int) (existed bool, resi
 	return existed, residentID
 }
 
+func GetResidents(sex int) ([]ResidentInTemple, bool) {
+	var residents []ResidentInTemple
+	_, err := o.Raw("SELECT * from v_resident_in_temple WHERE sex = ?", sex).QueryRows(&residents)
+	if err != nil {
+		println(err.Error())
+	}
+	return residents, true
+}
+
 func AddResident(data map[string]interface{}) (residentID int) {
 	resident := Resident{}
 	for key, value := range data {
