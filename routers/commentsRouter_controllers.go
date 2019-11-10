@@ -43,11 +43,29 @@ func init() {
             Filters: nil,
             Params: nil})
 
-    beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentController"] = append(beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentController"],
+    beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentCtrl"] = append(beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentCtrl"],
         beego.ControllerComments{
             Method: "GetResidents",
             Router: `/`,
             AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentCtrl"] = append(beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentCtrl"],
+        beego.ControllerComments{
+            Method: "GetResidentInfo",
+            Router: `/info`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentCtrl"] = append(beego.GlobalControllerRouter["api.sanghoffice/controllers:ResidentCtrl"],
+        beego.ControllerComments{
+            Method: "UpdateResidentInfo",
+            Router: `/info`,
+            AllowHTTPMethods: []string{"patch"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})

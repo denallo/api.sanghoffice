@@ -36,6 +36,7 @@ type Resident struct {
 }
 
 type ResidentInTemple struct {
+	ResidentId int
 	Name       string
 	Dhamame    string
 	Sex        int

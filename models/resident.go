@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+
 	"api.sanghoffice/tools"
 	"github.com/astaxie/beego/orm"
 )
@@ -25,9 +27,65 @@ func IsExistedResident(name string, isDhamame bool, sex int) (existed bool, resi
 	return existed, residentID
 }
 
-func GetResidents(sex int) ([]ResidentInTemple, bool) {
+func GetResidentInfo(residentId int) (Resident, bool) {
+	info := Resident{Id: residentId}
+	err := o.Read(&info)
+	if err != nil {
+		println(err.Error())
+		return info, false
+	}
+	return info, true
+}
+
+const TYPE_RESIDENT = 0
+const TYPE_PLAN_TO_LEAVE = 1
+const TYPE_PLAN_TO_LEAVE_CONFIRMED = 2
+const TYPE_APPOINT_TO_ARRIVE = 3
+const TYPE_APPOINT_TO_ARRIVE_CONFIRMED = 4
+
+const PRE_HINT_DAYS = 3
+
+func GetResidents(sex int, dataType int) ([]ResidentInTemple, bool) {
 	var residents []ResidentInTemple
-	_, err := o.Raw("SELECT * from v_resident_in_temple WHERE sex = ?", sex).QueryRows(&residents)
+	sqlCond := ""
+	sqlCurrDate := ""
+	sqlPreHintDate := ""
+	// currDate := time.Now().Format("2006-02-01")
+	switch dataType {
+	case TYPE_RESIDENT:
+		sqlCond = "`arrive` <= DATE_FORMAT(NOW(),'%Y-%m-%d') AND `leave` > DATE_FORMAT(NOW(),'%Y-%m-%d')"
+		break
+	case TYPE_APPOINT_TO_ARRIVE:
+		sqlCurrDate = "DATE_FORMAT(NOW(), '%Y-%m-%d')"
+		sqlPreHintDate = fmt.Sprintf(
+			"DATE_ADD(STR_TO_DATE(`arrive`, '%%Y-%%m-%%d'), interval -%d day)",
+			PRE_HINT_DAYS)
+		sqlCond = fmt.Sprintf(
+			"(%s >= %s AND %s <= `arrive`)",
+			sqlCurrDate, sqlPreHintDate,
+			sqlCurrDate)
+		break
+	case TYPE_APPOINT_TO_ARRIVE_CONFIRMED:
+		break
+	case TYPE_PLAN_TO_LEAVE:
+		sqlCurrDate = "DATE_FORMAT(NOW(), '%Y-%m-%d')"
+		sqlPreHintDate = fmt.Sprintf(
+			"DATE_ADD(STR_TO_DATE(`leave`, '%%Y-%%m-%%d'), interval -%d day)",
+			PRE_HINT_DAYS)
+		sqlCond = fmt.Sprintf(
+			"(%s >= %s AND %s <= `leave`)",
+			sqlCurrDate, sqlPreHintDate,
+			sqlCurrDate)
+		break
+	case TYPE_PLAN_TO_LEAVE_CONFIRMED:
+		break
+	default:
+		break
+	}
+	sql := fmt.Sprintf("SELECT * FROM v_resident_in_temple WHERE sex = %d AND %s", sex, sqlCond)
+	println(sql)
+	// _, err := o.Raw("SELECT * from v_resident_in_temple WHERE sex = ?", sex).QueryRows(&residents)
+	_, err := o.Raw(sql).QueryRows(&residents)
 	if err != nil {
 		println(err.Error())
 	}
@@ -70,4 +128,52 @@ func AddResident(data map[string]interface{}) (residentID int) {
 	}
 	residentID = int(id)
 	return residentID
+}
+
+func UpdateResident(data map[string]interface{}) (Resident, bool) {
+	id, success := tools.JsonNumberToInt(data["id"])
+	if !success {
+		return Resident{}, false
+	}
+	resident := Resident{Id: id}
+	err := o.Read(&resident, "id")
+	if err != nil {
+		println(err.Error())
+		return Resident{}, false
+	}
+	for key, value := range data {
+		if key == "name" {
+			resident.Name = value.(string)
+		} else if key == "dhamame" {
+			resident.Dhamame = value.(string)
+		} else if key == "sex" {
+			resident.Sex, _ = tools.JsonNumberToInt(value)
+		} else if key == "identifier" {
+			resident.Identifier = value.(string)
+		} else if key == "age" {
+			resident.Age, _ = tools.JsonNumberToInt(value)
+		} else if key == "type" {
+			resident.Type, _ = tools.JsonNumberToInt(value)
+		} else if key == "folk" {
+			resident.Folk = value.(string)
+		} else if key == "native_place" {
+			resident.NativePlace = value.(string)
+		} else if key == "ability" {
+			resident.Ability = value.(string)
+		} else if key == "phone" {
+			resident.Phone = value.(string)
+		} else if key == "emergency_contact" {
+			resident.EmergencyContact = value.(string)
+		} else if key == "emergency_contact_phone" {
+			resident.EmergencyContactPhone = value.(string)
+		}
+	}
+	o.Update(&resident)
+	resident = Resident{Id: id}
+	err = o.Read(&resident, "id")
+	if err != nil {
+		println(err.Error())
+		return Resident{}, false
+	}
+	return resident, true
 }

@@ -22,7 +22,7 @@ func init() {
 		),
 		beego.NSNamespace("/residents",
 			beego.NSInclude(
-				&controllers.ResidentController{},
+				&controllers.ResidentCtrl{},
 			),
 		),
 		beego.NSNamespace("/resiStatus",
