@@ -48,6 +48,7 @@ type ResidentInTemple struct {
 }
 
 const (
+	R_TYPE_UNSET          = -1
 	R_TYPE_MONK_UNCERTAIN = 100 // 出家众,未确认具体类型
 	R_TYPE_BHIKHU         = 0
 	R_TYPE_SAMANERA       = 1
@@ -95,6 +96,12 @@ type Item struct {
 	Confirmed    int    `orm:"column(confirmed)"`
 	ActivateDate string `orm:"column(activate_date)"`
 }
+
+const (
+	TYPE_PLAN_TO_LEAVE     = 0
+	TYPE_RESIDENT          = 1
+	TYPE_APPOINT_TO_ARRIVE = 2
+)
 
 func (tb *Item) TableName() string {
 	return "tb_item"
