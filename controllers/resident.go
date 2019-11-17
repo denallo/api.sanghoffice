@@ -28,12 +28,13 @@ func (this *ResidentCtrl) PtrData() *map[interface{}]interface{} {
 // @router / [get]
 func (this *ResidentCtrl) GetResidents() {
 	sex, _ := this.GetInt("sex")
-	dataType, _ := this.GetInt("dataType")
-	residents, success := models.GetResidents(sex, dataType)
+	state, _ := this.GetInt("state")
+	residents, success := models.GetResidents(sex, state)
 	if !success {
 		ReplyError(this,
 			STATUSCODE_EXCEPTIONOCCUR,
 			MESSAGE_EXCEPTIONOCCUR+fmt.Sprintf(""))
+		return
 	}
 	json := map[string]interface{}{}
 	json["residents"] = residents
@@ -64,6 +65,7 @@ func (this *ResidentCtrl) UpdateResidentInfo() {
 		ReplyError(this,
 			STATUSCODE_EXCEPTIONOCCUR,
 			MESSAGE_EXCEPTIONOCCUR+fmt.Sprintf(""))
+		return
 	}
 	json := map[string]interface{}{}
 	json["info"] = info

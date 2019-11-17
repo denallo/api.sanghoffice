@@ -37,54 +37,56 @@ func GetResidentInfo(residentId int) (Resident, bool) {
 	return info, true
 }
 
-const TYPE_RESIDENT = 0
-const TYPE_PLAN_TO_LEAVE = 1
-const TYPE_PLAN_TO_LEAVE_CONFIRMED = 2
-const TYPE_APPOINT_TO_ARRIVE = 3
-const TYPE_APPOINT_TO_ARRIVE_CONFIRMED = 4
+// const TYPE_RESIDENT = 0
+// const TYPE_PLAN_TO_LEAVE = 1
+// const TYPE_PLAN_TO_LEAVE_CONFIRMED = 2
+// const TYPE_APPOINT_TO_ARRIVE = 3
+// const TYPE_APPOINT_TO_ARRIVE_CONFIRMED = 4
 
 const PRE_HINT_DAYS = 3
 
-func GetResidents(sex int, dataType int) ([]ResidentInTemple, bool) {
+func GetResidents(sex int, state int) ([]ResidentInTemple, bool) {
 	var residents []ResidentInTemple
-	sqlCond := ""
-	sqlCurrDate := ""
-	sqlPreHintDate := ""
-	// currDate := time.Now().Format("2006-02-01")
-	switch dataType {
-	case TYPE_RESIDENT:
-		sqlCond = "`arrive` <= DATE_FORMAT(NOW(),'%Y-%m-%d') AND `leave` > DATE_FORMAT(NOW(),'%Y-%m-%d')"
-		break
-	case TYPE_APPOINT_TO_ARRIVE:
-		sqlCurrDate = "DATE_FORMAT(NOW(), '%Y-%m-%d')"
-		sqlPreHintDate = fmt.Sprintf(
-			"DATE_ADD(STR_TO_DATE(`arrive`, '%%Y-%%m-%%d'), interval -%d day)",
-			PRE_HINT_DAYS)
-		sqlCond = fmt.Sprintf(
-			"(%s >= %s AND %s <= `arrive`)",
-			sqlCurrDate, sqlPreHintDate,
-			sqlCurrDate)
-		break
-	case TYPE_APPOINT_TO_ARRIVE_CONFIRMED:
-		break
-	case TYPE_PLAN_TO_LEAVE:
-		sqlCurrDate = "DATE_FORMAT(NOW(), '%Y-%m-%d')"
-		sqlPreHintDate = fmt.Sprintf(
-			"DATE_ADD(STR_TO_DATE(`leave`, '%%Y-%%m-%%d'), interval -%d day)",
-			PRE_HINT_DAYS)
-		sqlCond = fmt.Sprintf(
-			"(%s >= %s AND %s <= `leave`)",
-			sqlCurrDate, sqlPreHintDate,
-			sqlCurrDate)
-		break
-	case TYPE_PLAN_TO_LEAVE_CONFIRMED:
-		break
-	default:
-		break
-	}
-	sql := fmt.Sprintf("SELECT * FROM v_resident_in_temple WHERE sex = %d AND %s", sex, sqlCond)
+	// sqlCond := ""
+	// sqlCurrDate := ""
+	// sqlPreHintDate := ""
+	// switch state {
+	// case TYPE_RESIDENT:
+	// 	sqlCond = "`arrive` <= DATE_FORMAT(NOW(),'%Y-%m-%d') AND `leave` > DATE_FORMAT(NOW(),'%Y-%m-%d')"
+	// 	break
+	// case TYPE_APPOINT_TO_ARRIVE:
+	// 	sqlCurrDate = "DATE_FORMAT(NOW(), '%Y-%m-%d')"
+	// 	sqlPreHintDate = fmt.Sprintf(
+	// 		"DATE_ADD(STR_TO_DATE(`arrive`, '%%Y-%%m-%%d'), interval -%d day)",
+	// 		PRE_HINT_DAYS)
+	// 	sqlCond = fmt.Sprintf(
+	// 		"(%s >= %s AND %s <= `arrive`)",
+	// 		sqlCurrDate, sqlPreHintDate,
+	// 		sqlCurrDate)
+	// 	break
+	// case TYPE_PLAN_TO_LEAVE:
+	// 	sqlCurrDate = "DATE_FORMAT(NOW(), '%Y-%m-%d')"
+	// 	sqlPreHintDate = fmt.Sprintf(
+	// 		"DATE_ADD(STR_TO_DATE(`leave`, '%%Y-%%m-%%d'), interval -%d day)",
+	// 		PRE_HINT_DAYS)
+	// 	sqlCond = fmt.Sprintf(
+	// 		"(%s >= %s AND %s <= `leave`)",
+	// 		sqlCurrDate, sqlPreHintDate,
+	// 		sqlCurrDate)
+	// 	break
+	// default:
+	// 	break
+	// }
+	// sql := fmt.Sprintf("SELECT * FROM v_resident_in_temple WHERE sex = %d AND %s", sex, sqlCond)
+	// sqlCurrDate = "DATE_FORMAT(NOW(), '%Y-%m-%d')"
+	// subSql := fmt.Sprintf("SELECT resident_id FROM tb_item WHERE type=%d AND enabled=1 AND ()", state)
+	sql := fmt.Sprintf(
+		"SELECT * FROM v_residents WHERE resident_id IN ("+
+			"SELECT resident_id FROM tb_item WHERE type=%d "+
+			"AND enabled = 1 AND confirmed != 1 "+
+			"AND (activate_date = '' OR activate_date <= DATE_FORMAT(NOW(), '%%Y-%%m-%%d')))",
+		state)
 	println(sql)
-	// _, err := o.Raw("SELECT * from v_resident_in_temple WHERE sex = ?", sex).QueryRows(&residents)
 	_, err := o.Raw(sql).QueryRows(&residents)
 	if err != nil {
 		println(err.Error())
