@@ -21,7 +21,14 @@ type ReqNewResiStatus struct {
 	Sex                   int    `json:"sex"`
 }
 
-func AddResiStatus(residentID int, sex int, kutiNumber int, kutiType int, arriveDate string, leaveDate string) bool {
+func AddResiStatus(
+	residentID int,
+	sex int,
+	kutiNumber int,
+	kutiType int,
+	arriveDate string,
+	leaveDate string) bool {
+
 	kuti := Kuti{Number: kutiNumber, ForSex: sex, Type: kutiType}
 	err := o.Read(&kuti, "number", "for_sex", "type")
 	if err != nil {
@@ -42,7 +49,11 @@ func AddResiStatus(residentID int, sex int, kutiNumber int, kutiType int, arrive
 	return true
 }
 
-func GetAvailablesInfo(kutiNumber int, kutiType int, forSex int) ([]([]int), bool) {
+func GetAvailablesInfo(
+	kutiNumber int,
+	kutiType int,
+	forSex int) ([]([]int), bool) {
+
 	kuti := Kuti{Number: kutiNumber, ForSex: forSex, Type: kutiType}
 	error := o.Read(&kuti, "number", "for_sex", "type")
 	if nil != error {
@@ -62,21 +73,26 @@ func GetAvailablesInfo(kutiNumber int, kutiType int, forSex int) ([]([]int), boo
 	var listEnagedStatus []([2]string) // [(arriveDate, leaveDate), ...]
 	for i := 0; i < int(cnt); i++ {
 		resiStatus := resiStatusList[i]
-		enagedInfo := [2]string{resiStatus.ArriveDate, resiStatus.PlanToLeaveDate}
+		enagedInfo := [2]string{
+			resiStatus.ArriveDate,
+			resiStatus.PlanToLeaveDate}
 		listEnagedStatus = append(listEnagedStatus, enagedInfo)
 	}
 
 	dateSessions := getDateSessions()
 	var avaliables []([]int)
-	for index := 0; index < len(dateSessions); index++ {
-		var avaliableUnmerged []([]int) // 用于合并一栋孤邸多个住众在同一天的入住状态
+	for i := 0; i < len(dateSessions); i++ {
+		// 用于合并一栋孤邸多个住众在同一天的入住状态
+		var avaliableUnmerged []([]int)
 		var avaliableMerged []int
-		startDate := dateSessions[index][0]
-		endDate := dateSessions[index][1]
-		for sub_index := 0; sub_index < len(listEnagedStatus); sub_index++ {
-			arriveDate := listEnagedStatus[sub_index][0]
-			leaveDate := listEnagedStatus[sub_index][1]
-			avaliableSingle := calcAvaliables(startDate, endDate, arriveDate, leaveDate)
+		startDate := dateSessions[i][0]
+		endDate := dateSessions[i][1]
+		for j := 0; j < len(listEnagedStatus); j++ {
+			arriveDate := listEnagedStatus[j][0]
+			leaveDate := listEnagedStatus[j][1]
+			avaliableSingle := calcAvaliables(
+				startDate, endDate,
+				arriveDate, leaveDate)
 			avaliableUnmerged = append(avaliableUnmerged, avaliableSingle)
 		}
 		if len(avaliableUnmerged) == 0 {
@@ -85,11 +101,11 @@ func GetAvailablesInfo(kutiNumber int, kutiType int, forSex int) ([]([]int), boo
 				avaliableMerged = append(avaliableMerged, 0)
 			}
 		} else {
-			for idxAvaliablesUnmerged := 0; idxAvaliablesUnmerged < len(avaliableUnmerged[0]); idxAvaliablesUnmerged++ {
+			for j := 0; j < len(avaliableUnmerged[0]); j++ {
 				statusMerged := -100
-				for idx := 0; idx < len(avaliableUnmerged); idx++ {
-					if statusMerged < avaliableUnmerged[idx][idxAvaliablesUnmerged] {
-						statusMerged = avaliableUnmerged[idx][idxAvaliablesUnmerged]
+				for k := 0; k < len(avaliableUnmerged); k++ {
+					if statusMerged < avaliableUnmerged[k][j] {
+						statusMerged = avaliableUnmerged[k][j]
 					}
 				}
 				avaliableMerged = append(avaliableMerged, statusMerged)
@@ -100,9 +116,15 @@ func GetAvailablesInfo(kutiNumber int, kutiType int, forSex int) ([]([]int), boo
 	return avaliables, true
 }
 
-func CreateItem(residentID int, arriveDate string, leaveDate string) bool {
+func CreateItem(
+	residentID int,
+	arriveDate string,
+	leaveDate string) bool {
+
 	items := []*Item{}
-	query := o.QueryTable("tb_item").Filter("resident_id", residentID).Filter("confirmed", 0)
+	query := o.QueryTable("tb_item").
+		Filter("resident_id", residentID).
+		Filter("confirmed", 0)
 	cnt, err := query.All(&items)
 	if err != nil {
 		println(err.Error())
@@ -136,4 +158,44 @@ func CreateItem(residentID int, arriveDate string, leaveDate string) bool {
 		}
 	}
 	return true
+}
+
+func CheckIn(
+	name string,
+	dhamame string,
+	identifer string,
+	sex int,
+	age int,
+	residentType int,
+	folk string,
+	nativePlace string,
+	ability string,
+	phone string,
+	emergencyContact string,
+	emergencyContactPhone string,
+	kutiNumber int,
+	kutiType int,
+	isMonk int,
+	arriveDate string,
+	leaveDate string) (int, bool) {
+
+	sql := o.Raw(
+		"call proc_check_in("+
+			"?, ?, ?, ?, ?,"+
+			"?, ?, ?, ?, ?,"+
+			"?, ?, ?, ?, ?,"+
+			"?, ?)",
+		name, dhamame, identifer, sex,
+		age, residentType, folk,
+		nativePlace, ability, phone,
+		emergencyContact, emergencyContactPhone,
+		kutiNumber, kutiType, isMonk,
+		arriveDate, leaveDate)
+	residentID := -1
+	err := sql.QueryRow(&residentID)
+	if nil != err {
+		println(err.Error())
+		return -1, false
+	}
+	return residentID, true
 }
