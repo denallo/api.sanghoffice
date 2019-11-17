@@ -3,3 +3,4 @@ debug
 lastupdate.tmp
 scripts/delete.sql
 scripts/develop.sql
+/routers/commentsRouter_controllers.go
