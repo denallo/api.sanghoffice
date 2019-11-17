@@ -8,7 +8,11 @@ import (
 func GetBrief(year int, month int) ([]int, bool) {
 	pattern := fmt.Sprintf("%d-%02d-%%", year, month)
 	items := []*Item{}
-	cnt, err := o.Raw("SELECT * FROM tb_item WHERE activate_date like ?", pattern).QueryRows(&items)
+	cnt, err := o.Raw(
+		"SELECT * FROM tb_item "+
+			"WHERE activate_date like ? "+
+			"AND confirmed = 0",
+		pattern).QueryRows(&items)
 	if err != nil {
 		println(err.Error())
 		return nil, false
