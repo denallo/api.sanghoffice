@@ -25,3 +25,16 @@ func GetBrief(year int, month int) ([]int, bool) {
 	}
 	return result, true
 }
+
+func UpdateResidentState(residentID int, stateType int) bool {
+	sql := o.Raw("call proc_confirm_item(?, ?)", residentID, stateType)
+	success := -1
+	err := sql.QueryRow(&success)
+	if nil != err {
+		println(err.Error())
+		return false
+	} else if success != 0 {
+		return false
+	}
+	return true
+}

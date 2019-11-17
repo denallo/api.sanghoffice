@@ -4,8 +4,10 @@ import (
 	"fmt"
 
 	"api.sanghoffice/models"
+	"api.sanghoffice/tools"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
+	"github.com/bitly/go-simplejson"
 )
 
 type ItemController struct {
@@ -36,4 +38,19 @@ func (this *ItemController) GetBrief() {
 	json := map[string]interface{}{}
 	json["brief"] = brief
 	ReplySuccess(this, json)
+}
+
+// @router /actions/confirm [patch]
+func (this *ItemController) Confirm() {
+	js, _ := simplejson.NewJson(this.Ctx.Input.RequestBody)
+	jsMap, _ := js.Map()
+	residentID, _ := tools.JsonNumberToInt(jsMap["residentID"])
+	stateType, _ := tools.JsonNumberToInt(jsMap["stateType"])
+	success := models.UpdateResidentState(residentID, stateType)
+	if !success {
+		ReplyError(this, STATUSCODE_EXCEPTIONOCCUR,
+			MESSAGE_EXCEPTIONOCCUR+fmt.Sprintf(""))
+		return
+	}
+	ReplySuccess(this, nil)
 }
