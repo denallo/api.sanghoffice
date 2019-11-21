@@ -60,8 +60,8 @@ BEGIN
 	IF arriveDate > currDate THEN
 		INSERT INTO tb_item (next_item_id, resident_id, tb_item.type, enabled, confirmed, activate_date)
 			VALUES (lastInsertedID, residentID, 0, 1, 0, arriveDate);
-	ELSE -- 当天入住，将代表“在寺”状态的record设为enabled和confirmed；将“计划离开”设为enabled
-		UPDATE tb_item SET enabled = 1, confirmed = 1 WHERE id = lastInsertedID;
+	ELSE -- 当天入住，将代表“在寺”状态的record设为enabled；将“计划离开”设为enabled
+		UPDATE tb_item SET enabled = 1 WHERE id = lastInsertedID;
         SELECT next_item_id INTO idPlanToLeave FROM tb_item WHERE id = lastInsertedID; 
         UPDATE tb_item SET enabled = 1 WHERE id = idPlanToLeave;
 	END IF;
