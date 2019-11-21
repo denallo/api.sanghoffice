@@ -91,9 +91,12 @@ func (tb *ResiHistory) TableName() string {
 
 type Item struct {
 	Id           int    `orm:"column(id)"`
+	NextItemId   int    `orm:"column(next_item_id)"`
 	ResidentId   int    `orm:"column(resident_id)"`
 	Type         int    `orm:"column(type)"`
 	Confirmed    int    `orm:"column(confirmed)"`
+	Enabled      int    `orm:"column(enabled)"`
+	Canceled     int    `orm:"column(canceled)"`
 	ActivateDate string `orm:"column(activate_date)"`
 }
 

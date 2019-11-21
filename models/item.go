@@ -11,7 +11,8 @@ func GetBrief(year int, month int) ([]int, bool) {
 	cnt, err := o.Raw(
 		"SELECT * FROM tb_item "+
 			"WHERE activate_date like ? "+
-			"AND confirmed = 0",
+			"AND confirmed = 0 "+
+			"AND canceled = 0",
 		pattern).QueryRows(&items)
 	if err != nil {
 		println(err.Error())

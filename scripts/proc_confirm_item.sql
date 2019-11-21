@@ -13,9 +13,9 @@ BEGIN
     SET SQL_SAFE_UPDATES = 0;
 	START TRANSACTION;
 		UPDATE tb_item SET confirmed = 1
-			WHERE resident_id = residentID AND type = itemType AND enabled = 1;
+			WHERE resident_id = residentID AND type = itemType AND enabled = 1 AND canceled = 0;
 		SELECT id, next_item_id INTO idCurrState, idNextState FROM tb_item
-			WHERE resident_id = residentID AND type = itemType AND enabled = 1;
+			WHERE resident_id = residentID AND type = itemType AND enabled = 1 AND canceled = 0;
 		IF idNextState != -1 THEN
 			-- 将下一个状态item设为enabled
 			UPDATE tb_item SET enabled = 1 WHERE id = idNextState;

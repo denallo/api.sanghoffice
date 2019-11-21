@@ -29,17 +29,19 @@ VIEW `v_residents` (`resident_id` , `name` , `dhamame` , `sex` , `type` , `kuti_
                 `tmp_kuti`.`kuti_type` AS `kuti_type`,
                 `tmp_resi_status`.`arrive` AS `arrive`,
                 `tmp_resi_status`.`leave` AS `leave`
-        FROM
-            ((SELECT 
-            `tb_resi_status`.`resident_id` AS `id`,
-                `tb_resi_status`.`kuti_id` AS `kuti_id`,
-                `tb_resi_status`.`arrive_date` AS `arrive`,
-                `tb_resi_status`.`plan_to_leave_date` AS `leave`
-        FROM
-            `tb_resi_status`) `tmp_resi_status`
-        JOIN (SELECT 
-            `tb_kuti`.`id` AS `kuti_id`,
-                `tb_kuti`.`type` AS `kuti_type`,
-                `tb_kuti`.`number` AS `kuti_number`
-        FROM
-            `tb_kuti`) `tmp_kuti` ON ((`tmp_resi_status`.`kuti_id` = `tmp_kuti`.`kuti_id`)))) `tmp_resi_status` ON ((`tmp_resident`.`resident_id` = `tmp_resi_status`.`id`)))
+			FROM
+				((SELECT 
+				`tb_resi_status`.`resident_id` AS `id`,
+					`tb_resi_status`.`kuti_id` AS `kuti_id`,
+					`tb_resi_status`.`arrive_date` AS `arrive`,
+					`tb_resi_status`.`plan_to_leave_date` AS `leave`
+				FROM
+					`tb_resi_status`) `tmp_resi_status`
+			JOIN (SELECT 
+				`tb_kuti`.`id` AS `kuti_id`,
+					`tb_kuti`.`type` AS `kuti_type`,
+					`tb_kuti`.`number` AS `kuti_number`
+				FROM
+					`tb_kuti`) `tmp_kuti`
+			ON ((`tmp_resi_status`.`kuti_id` = `tmp_kuti`.`kuti_id`)))) `tmp_resi_status`
+		ON ((`tmp_resident`.`resident_id` = `tmp_resi_status`.`id`)))
