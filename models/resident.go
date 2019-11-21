@@ -86,6 +86,12 @@ func GetResidents(sex int, state int) ([]ResidentInTemple, bool) {
 			"AND enabled = 1 AND confirmed != 1 "+
 			"AND (activate_date = '' OR activate_date <= DATE_FORMAT(NOW(), '%%Y-%%m-%%d')))",
 		state)
+	if state == TYPE_APPOINTED {
+		sql = fmt.Sprintf(
+			"SELECT * FROM v_residents WHERE resident_id IN (" +
+				"SELECT resident_id FROM tb_item WHERE type = 0 " +
+				"AND enabled = 1 AND confirmed != 1)")
+	}
 	println(sql)
 	_, err := o.Raw(sql).QueryRows(&residents)
 	if err != nil {

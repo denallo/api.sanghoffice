@@ -101,9 +101,10 @@ type Item struct {
 }
 
 const (
-	TYPE_PLAN_TO_LEAVE     = 0
+	TYPE_APPOINT_TO_ARRIVE = 0
 	TYPE_RESIDENT          = 1
-	TYPE_APPOINT_TO_ARRIVE = 2
+	TYPE_PLAN_TO_LEAVE     = 2
+	TYPE_APPOINTED         = 3
 )
 
 func (tb *Item) TableName() string {
