@@ -2,15 +2,16 @@ DROP PROCEDURE IF EXISTS `proc_confirm_item`;
 DELIMITER $
 CREATE PROCEDURE `proc_confirm_item` (IN residentID INT, IN itemType INT)
 BEGIN
-    DECLARE idCurrState INT;
-    DECLARE idPreState INT;
+	DECLARE idCurrState INT;
+	DECLARE idPreState INT;
 	DECLARE idNextState INT;
 	DECLARE idNextNextState INT;
 	DECLARE typeNextState INT;
 	DECLARE errorOccured INT;
+	DECLARE arriveDate VARCHAR(10);
 	DECLARE CONTINUE HANDLER FOR SQLEXCEPTION SET errorOccured = 1;
 	SET errorOccured = 0;	
-    SET SQL_SAFE_UPDATES = 0;
+	SET SQL_SAFE_UPDATES = 0;
 	START TRANSACTION;
 		UPDATE tb_item SET confirmed = 1
 			WHERE resident_id = residentID AND type = itemType AND enabled = 1 AND canceled = 0;
@@ -27,19 +28,22 @@ BEGIN
 -- 				UPDATE tb_item SET confirmed = 1 WHERE id = idNextState;
 				-- 将“在寺”的下一个状态设为enabled
 				UPDATE tb_item SET enabled = 1 WHERE id = idNextNextState;
+				-- 对于提前到达的情况，设置resi_status的arrive_date
+				UPDATE tb_resi_status SET arrive_date = DATE_FORMAT(NOW(), '%Y-%m-%d')
+					WHERE resident_id = residentID AND arrive_date > DATE_FORMAT(NOW(), '%Y-%m-%d');            
 			END IF;
 		ELSE -- 没有下一个状态（此处默认当前状态为PLAN_TO_LEAVE），将该住众与原先分配的孤邸解除绑定
 			DELETE FROM tb_resi_status WHERE resident_id = residentID;
-            -- 将对应的“在寺”状态设为confirmed
-            SELECT id INTO idPreState FROM tb_item WHERE next_item_id = idCurrState;
-            UPDATE tb_item SET confirmed = 1 WHERE id = idPreState;
+			-- 将对应的“在寺”状态设为confirmed
+			SELECT id INTO idPreState FROM tb_item WHERE next_item_id = idCurrState;
+			UPDATE tb_item SET confirmed = 1 WHERE id = idPreState;
 		END IF;
 	IF errorOccured = 0 THEN
 		COMMIT;
-        SELECT 0;
+		SELECT 0;
 	ELSE
 		ROLLBACK;
-        SELECT -1;
+		SELECT -1;
 	END IF;
 	SET SQL_SAFE_UPDATES = 1;
 END;
