@@ -153,6 +153,7 @@ func GetKuties(forSex int) map[string]interface{} {
 	var kutiesInfo [](map[string]interface{})
 	for i := 0; i < len(kuties); i++ { // 遍历孤邸
 		kutiInfo := kuties[i]
+		unconfirmeds := []int{}
 		jsonKutiInfo := map[string]interface{}{}
 		jsonKutiInfo["kutiNumber"] = kutiInfo.Number
 		jsonKutiInfo["type"] = kutiInfo.Type
@@ -171,6 +172,10 @@ func GetKuties(forSex int) map[string]interface{} {
 			// 入住与离开日期
 			enagedStatus := [2]string{resiStatus.ArriveDate, resiStatus.PlanToLeaveDate}
 			listEnagedStatus = append(listEnagedStatus, enagedStatus)
+			if remainUnconfirmed(resident.Id) {
+				jsonKutiInfo["blocked"] = 1
+				unconfirmeds = append(unconfirmeds, resident.Id)
+			}
 			// 人员信息
 			residentInfo["id"] = resident.Id
 			residentInfo["dhamame"] = resident.Dhamame
@@ -234,6 +239,7 @@ func GetKuties(forSex int) map[string]interface{} {
 		}
 		jsonKutiInfo["avaliables"] = avaliables
 		jsonKutiInfo["residents"] = listResidentsInfo
+		jsonKutiInfo["unconfirmeds"] = unconfirmeds
 		kutiesInfo = append(kutiesInfo, jsonKutiInfo)
 	}
 	// 当前及接下来四个月份
@@ -288,4 +294,20 @@ func UpdateBrokenStatus(kutiNumber int, kutiType int, forSex int, brokenStatus i
 	}
 	println(fmt.Sprintf("effected row: %d", cnt))
 	return true
+}
+
+func remainUnconfirmed(residentID int) bool {
+	currDate := time.Now().Format("2006-01-02")
+	items := []*Item{}
+	query := o.QueryTable("tb_item").
+		Filter("resident_id", residentID).
+		Filter("enabled", 1).Filter("confirmed", 0).
+		Filter("type__in", TYPE_APPOINT_TO_ARRIVE, TYPE_PLAN_TO_LEAVE).
+		Filter("activate_date__lt", currDate)
+	cnt, err := query.All(&items)
+	if nil != err {
+		println(err.Error())
+		return false
+	}
+	return cnt != 0
 }

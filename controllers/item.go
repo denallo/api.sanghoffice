@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"time"
 
 	"api.sanghoffice/models"
 	"api.sanghoffice/tools"
@@ -29,16 +30,52 @@ func (ctrl *ItemController) PtrData() *map[interface{}]interface{} {
 
 // @router / [get]
 func (this *ItemController) GetBrief() {
-	year, _ := this.GetInt("year")
-	month, _ := this.GetInt("month")
-	brief, success := models.GetBrief(year, month)
-	if !success {
-		ReplyError(this, STATUSCODE_EXCEPTIONOCCUR, MESSAGE_EXCEPTIONOCCUR+fmt.Sprintf(""))
-		return
+	_, brief := this.GetInt("brief")
+	_, unconfirmed := this.GetInt("unconfirmed")
+	if brief == nil {
+		year, _ := this.GetInt("year")
+		month, _ := this.GetInt("month")
+		brief, success := models.GetBrief(year, month)
+		if !success {
+			ReplyError(this, STATUSCODE_EXCEPTIONOCCUR, MESSAGE_EXCEPTIONOCCUR+fmt.Sprintf(""))
+			return
+		}
+		json := map[string]interface{}{}
+		json["brief"] = brief
+		ReplySuccess(this, json)
+	} else if unconfirmed == nil {
+		residentID, _ := this.GetInt("residentID")
+		o := orm.NewOrm()
+		currDate := time.Now().Format("2006-01-02")
+		items := []*models.Item{}
+		query := o.QueryTable("tb_item").
+			Filter("resident_id", residentID).
+			Filter("enabled", 1).Filter("confirmed", 0).
+			Filter("type__in",
+				models.TYPE_APPOINT_TO_ARRIVE,
+				models.TYPE_PLAN_TO_LEAVE).
+			Filter("activate_date__lt", currDate)
+		_, err := query.All(&items)
+		if nil != err {
+			println(err.Error())
+			ReplyError(this,
+				STATUSCODE_EXCEPTIONOCCUR,
+				MESSAGE_EXCEPTIONOCCUR+fmt.Sprintf("%s", err.Error()))
+			return
+		}
+		retJson := map[string]interface{}{}
+		retJson["residentID"] = residentID
+		retItems := []map[string]interface{}{}
+		for i := 0; i < len(items); i++ {
+			retItem := map[string]interface{}{}
+			retItem["itemID"] = items[i].Id
+			retItem["itemType"] = items[i].Type
+			retItem["activateDate"] = items[i].ActivateDate
+			retItems = append(retItems, retItem)
+		}
+		retJson["unconfirmeds"] = retItems
+		ReplySuccess(this, retJson)
 	}
-	json := map[string]interface{}{}
-	json["brief"] = brief
-	ReplySuccess(this, json)
 }
 
 // @router /actions/confirm [patch]

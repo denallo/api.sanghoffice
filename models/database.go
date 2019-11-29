@@ -104,7 +104,7 @@ const (
 	TYPE_APPOINT_TO_ARRIVE = 0
 	TYPE_RESIDENT          = 1
 	TYPE_PLAN_TO_LEAVE     = 2
-	TYPE_APPOINTED         = 3
+	TYPE_APPOINTED         = 3 // 目前没有对应的item
 )
 
 func (tb *Item) TableName() string {
