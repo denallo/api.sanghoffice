@@ -3,6 +3,8 @@ package controllers
 import (
 	"fmt"
 
+	"github.com/astaxie/beego/orm"
+
 	"api.sanghoffice/models"
 	"api.sanghoffice/tools"
 
@@ -123,4 +125,36 @@ func (this *ResiStatusCtrl) AddResiStatus() {
 	retJson["availables"] = avaliables
 	this.Data["json"] = retJson
 	ReplySuccess(this, retJson)
+}
+
+// @router / [patch]
+func (this *ResiStatusCtrl) ChangeKuti() {
+	js, _ := simplejson.NewJson(this.Ctx.Input.RequestBody)
+	jsMap, _ := js.Map()
+	residentID, _ := tools.JsonNumberToInt(jsMap["residentID"])
+	kutiType, _ := tools.JsonNumberToInt(jsMap["kutiType"])
+	kutiNumber, _ := tools.JsonNumberToInt(jsMap["kutiNumber"])
+	kutiForSex, _ := tools.JsonNumberToInt(jsMap["kutiForSex"])
+	o := orm.NewOrm()
+	kutiID := 0
+	err := o.Raw(
+		"SELECT id FROM tb_kuti "+
+			"WHERE type=? AND for_sex=? AND number=?",
+		kutiType, kutiForSex, kutiNumber).QueryRow(&kutiID)
+	if nil != err {
+		println(err.Error())
+		ReplyError(this, STATUSCODE_EXCEPTIONOCCUR,
+			MESSAGE_EXCEPTIONOCCUR+err.Error())
+		return
+	}
+	_, err = o.Raw(
+		"UPDATE tb_resi_status SET kuti_id=? WHERE resident_id=?",
+		kutiID, residentID).Exec()
+	if nil != err {
+		println(err.Error())
+		ReplyError(this, STATUSCODE_EXCEPTIONOCCUR,
+			MESSAGE_EXCEPTIONOCCUR+err.Error())
+		return
+	}
+	ReplySuccess(this, nil)
 }
