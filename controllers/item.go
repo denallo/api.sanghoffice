@@ -54,7 +54,7 @@ func (this *ItemController) GetBrief() {
 			Filter("type__in",
 				models.TYPE_APPOINT_TO_ARRIVE,
 				models.TYPE_PLAN_TO_LEAVE).
-			Filter("activate_date__lt", currDate)
+			Filter("activate_date__lte", currDate)
 		_, err := query.All(&items)
 		if nil != err {
 			println(err.Error())
@@ -115,7 +115,7 @@ func (this *ItemController) Leave() {
 		// 所有相关item置为enabled和confirmed
 		sql := fmt.Sprintf(
 			"UPDATE tb_item SET enabled = 1, confirmed = 1 " +
-				"WHERE  resident_id = ? AND cancel = 0")
+				"WHERE  resident_id = ? AND canceled = 0")
 		_, err = o.Raw(sql, residentID).Exec()
 		if nil != err {
 			break
