@@ -48,15 +48,16 @@ type ResidentInTemple struct {
 }
 
 const (
-	R_TYPE_UNSET          = -1
-	R_TYPE_MONK_UNCERTAIN = 100 // 出家众,未确认具体类型
-	R_TYPE_BHIKHU         = 0
-	R_TYPE_SAMANERA       = 1
-	R_TYPE_SAYALAY        = 2
-	R_TYPE_OTHER_MONK     = 3
-	R_TYPE_SERVER         = 4
-	R_TYPE_DHAMWORKER     = 5
-	R_TYPE_OTHER_HOMER    = 6
+	R_TYPE_UNSET           = -1
+	R_TYPE_MONK_UNCERTAIN  = 100 // 出家众,未确认具体类型
+	R_TYPE_HOMER_UNCERTAIN = 101 // 在家众,未确认具体类型
+	R_TYPE_BHIKHU          = 0
+	R_TYPE_SAMANERA        = 1
+	R_TYPE_SAYALAY         = 2
+	R_TYPE_OTHER_MONK      = 3
+	R_TYPE_SERVER          = 4
+	R_TYPE_DHAMWORKER      = 5
+	R_TYPE_OTHER_HOMER     = 6
 )
 
 func (tb *Resident) TableName() string {
