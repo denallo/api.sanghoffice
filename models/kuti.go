@@ -183,7 +183,8 @@ func GetKuties(forSex int) map[string]interface{} {
 			if R_TYPE_BHIKHU == resident.Type ||
 				R_TYPE_SAMANERA == resident.Type ||
 				R_TYPE_SAYALAY == resident.Type ||
-				R_TYPE_OTHER_MONK == resident.Type {
+				R_TYPE_OTHER_MONK == resident.Type ||
+				R_TYPE_MONK_UNCERTAIN == resident.Type {
 				// if resident.Dhamame != "" {
 				// 	residentInfo["name"] = resident.Dhamame
 				// } else {
@@ -303,7 +304,7 @@ func remainUnconfirmed(residentID int) bool {
 		Filter("resident_id", residentID).
 		Filter("enabled", 1).Filter("confirmed", 0).
 		Filter("type__in", TYPE_APPOINT_TO_ARRIVE, TYPE_PLAN_TO_LEAVE).
-		Filter("activate_date__lt", currDate)
+		Filter("activate_date__lte", currDate)
 	cnt, err := query.All(&items)
 	if nil != err {
 		println(err.Error())
