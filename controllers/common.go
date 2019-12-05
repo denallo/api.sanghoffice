@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"api.sanghoffice/components"
 	"github.com/astaxie/beego/context"
 )
 
@@ -52,3 +53,13 @@ func ReplySuccess(ctrl interface{ Ctrl }, json interface{}) {
 // 	sessionID := ctrl.Context().Input.Header(HEADER_SESSIONID)
 // 	return components.GetUserID(sessionID)
 // }
+
+func FilterSessionID(ctx *context.Context) {
+	sessionID := ctx.Input.Header(HEADER_SESSIONID)
+	if false == components.IsValidSession(sessionID) {
+		ctx.Output.SetStatus(STATUSCODE_INVALIDSESSIONID)
+		ctx.Output.Header(HEADER_MESSAGE, MESSAGE_INVALIDSESSIONID)
+	}
+	return
+}
+
