@@ -28,6 +28,12 @@ func (this *ResidentCtrl) PtrData() *map[interface{}]interface{} {
 // @router / [get]
 func (this *ResidentCtrl) GetResidents() {
 	sex, _ := this.GetInt("sex")
+	userRole := UserRole(this)
+	switch userRole {
+	case models.ROLE_MALE_ADM:
+	case models.ROLE_FEMALE_ADM:
+		sex = userRole
+	}
 	state, _ := this.GetInt("state")
 	residents, success := models.GetResidents(sex, state)
 	if !success {

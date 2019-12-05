@@ -38,6 +38,12 @@ func (this *ResiStatusCtrl) AddResiStatus() {
 	dhamame := jsMap["dhamame"].(string)
 	identifier := jsMap["identifier"].(string)
 	sex, _ := tools.JsonNumberToInt(jsMap["sex"])
+	userRole := UserRole(this)
+	switch userRole {
+	case models.ROLE_MALE_ADM:
+	case models.ROLE_FEMALE_ADM:
+		sex = userRole
+	}
 	age, _ := tools.JsonNumberToInt(jsMap["age"])
 	residentType, _ := tools.JsonNumberToInt(jsMap["type"])
 	folk := jsMap["folk"].(string)
@@ -46,32 +52,6 @@ func (this *ResiStatusCtrl) AddResiStatus() {
 	phone := jsMap["phone"].(string)
 	emergencyContact := jsMap["emergency_contact"].(string)
 	emergencyContactPhone := jsMap["emergency_contact_phone"].(string)
-	// var isExisted bool
-	// var residentID int
-	// sex, _ := tools.JsonNumberToInt(jsMap["sex"])
-	// // nameText := ""
-	// if name != "" {
-	// 	// nameText = name
-	// 	isExisted, residentID = models.IsExistedResident(name, false, sex)
-	// }
-	// if dhamame != "" {
-	// 	// nameText = dhamame
-	// 	isExisted, residentID = models.IsExistedResident(dhamame, true, sex)
-	// }
-	// if !isExisted {
-	// 	// ReplyError(this,
-	// 	// 	STATUSCODE_CONFLICT,
-	// 	// 	MESSAGE_CONFLICT+fmt.Sprintf(
-	// 	// 		"unknow Resident：%s，cannot create ResiStatus", nameText))
-	// 	residentID = models.AddResident(jsMap)
-	// 	if -1 == residentID {
-	// 		ReplyError(this,
-	// 			STATUSCODE_EXCEPTIONOCCUR,
-	// 			MESSAGE_EXCEPTIONOCCUR+fmt.Sprintf(
-	// 				"fail to create resident resource"))
-	// 		return
-	// 	}
-	// }
 
 	kutiNumber, _ := tools.JsonNumberToInt(jsMap["kutiNumber"])
 	kutiType, _ := tools.JsonNumberToInt(jsMap["kutiType"])

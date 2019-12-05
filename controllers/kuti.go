@@ -33,6 +33,12 @@ func (ctrl *KutiController) PtrData() *map[interface{}]interface{} {
 // @router / [get]
 func (this *KutiController) Get() {
 	kutiForSex, _ := strconv.Atoi(this.Ctx.Input.Param("sex"))
+	userRole := UserRole(this)
+	switch userRole {
+	case models.ROLE_MALE_ADM:
+	case models.ROLE_FEMALE_ADM:
+		kutiForSex = userRole
+	}
 	_, getRange := this.GetInt("range")
 	_, getValidTypes := this.GetInt("types")
 	retJson := map[string]interface{}{}
@@ -103,6 +109,12 @@ func (this *KutiController) UpdateBrokenStatus() {
 	kutiNumber, _ := tools.JsonNumberToInt(jsMap["kutiNumber"])
 	kutiType, _ := tools.JsonNumberToInt(jsMap["kutiType"])
 	forSex, _ := tools.JsonNumberToInt(jsMap["forSex"])
+	userRole := UserRole(this)
+	switch userRole {
+	case models.ROLE_MALE_ADM:
+	case models.ROLE_FEMALE_ADM:
+		forSex = userRole
+	}
 	brokenStatus, _ := tools.JsonNumberToInt(jsMap["brokenStatus"])
 	if true == models.UpdateBrokenStatus(kutiNumber, kutiType, forSex, brokenStatus) {
 		ReplySuccess(this, nil)

@@ -66,3 +66,13 @@ func FilterSessionID(ctx *context.Context) {
 	}
 	return
 }
+
+func UserRole(ctrl interface{ Ctrl }) int {
+	sessionID := ctrl.Context().Input.Header(HEADER_SESSIONID)
+	_role, success := components.GetUserData(sessionID, components.USERDATA_ROLE)
+	if !success {
+		println("Cannot get user role, sessionID=" + sessionID)
+		return -1
+	}
+	return _role.(int)
+}

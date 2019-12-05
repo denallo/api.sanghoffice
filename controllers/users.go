@@ -47,6 +47,15 @@ func (this *UsersCtrl) Login() {
 	sessionID := components.GenerateSessionID(fingerprint, false, "")
 	retJson := map[string]string{}
 	retJson["sessionID"] = sessionID
+	// 根据用户角色进行相应处理
+	role := user.Role
+	success, info := components.SetUserData(sessionID, components.USERDATA_ROLE, role)
+	if !success {
+		println(info)
+		ReplyError(this, STATUSCODE_EXCEPTIONOCCUR,
+			MESSAGE_EXCEPTIONOCCUR+info)
+		return
+	}
 	ReplySuccess(this, retJson)
 }
 

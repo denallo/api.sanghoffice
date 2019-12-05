@@ -26,6 +26,7 @@ type SessionData struct {
 const (
 	USERDATA_LASTORDERID = "LastOrderID"
 	USERDATA_DONORID     = "DonorID"
+	USERDATA_ROLE        = "Role"
 )
 
 // 生成用户会话ID
