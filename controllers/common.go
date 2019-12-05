@@ -55,6 +55,10 @@ func ReplySuccess(ctrl interface{ Ctrl }, json interface{}) {
 // }
 
 func FilterSessionID(ctx *context.Context) {
+	if ctx.Request.RequestURI[0:9] == "/v1/users" &&
+		(ctx.Request.Method == "POST" || ctx.Request.Method == "GET") {
+		return
+	}
 	sessionID := ctx.Input.Header(HEADER_SESSIONID)
 	if false == components.IsValidSession(sessionID) {
 		ctx.Output.SetStatus(STATUSCODE_INVALIDSESSIONID)
@@ -62,4 +66,3 @@ func FilterSessionID(ctx *context.Context) {
 	}
 	return
 }
-

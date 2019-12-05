@@ -112,6 +112,22 @@ func (tb *Item) TableName() string {
 	return "tb_item"
 }
 
+type User struct {
+	Id       int    `orm:"column(id)"`
+	UserName string `orm:"column(username)"`
+	Password string `orm:"column(password)"`
+	Role     int    `orm:"column(role)"`
+}
+
+const (
+	ROLE_MALE_ADM   = 0
+	ROLE_FEMALE_ADM = 1
+)
+
+func (tb *User) TableName() string {
+	return "tb_user"
+}
+
 // type Instance struct {
 // 	Identifier string `orm:"pk;column(identifier)"`
 // 	ClassName  string `orm:"column(class_name)"`
@@ -273,6 +289,7 @@ func init() {
 	orm.RegisterModel(new(ResiStatus))
 	orm.RegisterModel(new(ResiHistory))
 	orm.RegisterModel(new(Item))
+	orm.RegisterModel(new(User))
 	// orm.RegisterModel(new(Instance))
 	// orm.RegisterModel(new(Relations))
 	orm.RunSyncdb("default", false, false)
