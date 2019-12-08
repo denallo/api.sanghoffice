@@ -71,3 +71,16 @@ func (this *UsersCtrl) QuerySessionID() {
 	retJson["sessionID"] = sessionID
 	ReplySuccess(this, retJson)
 }
+
+//@router / [delete]
+func (this *UsersCtrl) Logout() {
+	// js, _ := simplejson.NewJson(this.Ctx.Input.RequestBody)
+	// jsMap, _ := js.Map()
+	// fingerprint, _ := jsMap["Fingerprint"].(string)
+	fingerprint := this.GetString("Fingerprint")
+	if components.IsRegistedUser(fingerprint) {
+		components.DelSession(fingerprint)
+	}
+	ReplySuccess(this, nil)
+	println("success")
+}
