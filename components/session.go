@@ -31,8 +31,8 @@ const (
 
 // 生成用户会话ID
 func GenerateSessionID(userID string, isUnionID bool, sessionKey string) (sessionID string) {
-	if isRegistedUser(userID) {
-		delSession(userID)
+	if IsRegistedUser(userID) {
+		DelSession(userID)
 	}
 	_uuid, _ := uuid.NewV1()
 	sessionID = _uuid.String()
@@ -66,7 +66,7 @@ func GetUserID(sessionID string) (userID string, success bool) {
 // 获取会话ID
 func GetSessionID(userID string) (sessionID string, success bool) {
 	success = false
-	if !isRegistedUser(userID) {
+	if !IsRegistedUser(userID) {
 		return
 	}
 	res := user2session.Get(userID)
@@ -126,12 +126,12 @@ func refreshSession(sessionID string) {
 	saveSession(sessionID, sessData.(SessionData))
 }
 
-func isRegistedUser(userID string) (existed bool) {
+func IsRegistedUser(userID string) (existed bool) {
 	existed = user2session.IsExist(userID)
 	return
 }
 
-func delSession(userID string) {
+func DelSession(userID string) {
 	sessionID := user2session.Get(userID).(string)
 	user2session.Delete(userID)
 	sessionData.Delete(sessionID)
