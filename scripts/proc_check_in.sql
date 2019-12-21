@@ -1,3 +1,4 @@
+use sanghoffice;
 DROP PROCEDURE IF EXISTS `proc_check_in`;
 DELIMITER $
 CREATE PROCEDURE `proc_check_in` (
@@ -33,12 +34,12 @@ BEGIN
   START TRANSACTION;
     -- ------------------- 如果resident不存在则创建 ------------------------
 	SELECT id INTO residentID FROM tb_resident
-	WHERE (name = @name AND name != '') 
-	OR (dhamame = @dhamame AND dhamame != '') LIMIT 1;
+	WHERE (name = @name AND @name != '') 
+	OR (dhamame = @dhamame AND @dhamame != '') LIMIT 1;
     IF -1 = residentID THEN
       INSERT INTO tb_resident (name, dhamame, sex, identifier, age, type, folk, native_place, ability, phone, emergency_contact, emergency_contact_phone)
-      VALUES (name, dhamame, sex, identifier, age, type, folk, native_place, ability, phone, emergencyContact, emergencyContactPhone);
-      SET residentID = LAST_INSERT_ID();
+      VALUES (name, dhamame, sex, identifier, age, type, folk, nativePlace, ability, phone, emergencyContact, emergencyContactPhone);
+	  SET residentID = LAST_INSERT_ID();
 	END IF;
     -- ------------------ 创建该resident本次入住的resi_status -----------------------
     SELECT id INTO kutiID FROM tb_kuti WHERE for_sex = sex AND number = kutiNumber AND tb_kuti.type = kutiType;
@@ -65,11 +66,11 @@ BEGIN
         SELECT next_item_id INTO idPlanToLeave FROM tb_item WHERE id = lastInsertedID; 
         UPDATE tb_item SET enabled = 1 WHERE id = idPlanToLeave;
 	END IF;
-  IF errorOccured = 0 THEN
-    COMMIT;
-    SELECT residentID;
-  ELSE
-	ROLLBACK;
-    SELECT -100;
-  END IF;
+    IF errorOccured = 0 THEN
+		COMMIT;
+		SELECT residentID;
+	ELSE
+		ROLLBACK;
+		SELECT -100;
+    END IF;
 END
