@@ -5,15 +5,16 @@ import (
 	"strconv"
 )
 
-func GetBrief(year int, month int) ([]int, bool) {
+func GetBrief(year int, month int, sex int) ([]int, bool) {
 	pattern := fmt.Sprintf("%d-%02d-%%", year, month)
 	items := []*Item{}
 	cnt, err := o.Raw(
 		"SELECT * FROM tb_item "+
 			"WHERE activate_date like ? "+
 			"AND confirmed = 0 "+
-			"AND canceled = 0",
-		pattern).QueryRows(&items)
+			"AND canceled = 0 "+
+			"AND resident_id in (SELECT id FROM tb_resident WHERE sex = ?)",
+		pattern, sex).QueryRows(&items)
 	if err != nil {
 		println(err.Error())
 		return nil, false

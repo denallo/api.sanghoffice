@@ -30,12 +30,19 @@ func (ctrl *ItemController) PtrData() *map[interface{}]interface{} {
 
 // @router / [get]
 func (this *ItemController) GetBrief() {
+	userRole := UserRole(this)
+	sex := -1
+	switch userRole {
+	case models.ROLE_MALE_ADM:
+	case models.ROLE_FEMALE_ADM:
+		sex = userRole
+	}
 	_, brief := this.GetInt("brief")
 	_, unconfirmed := this.GetInt("unconfirmed")
 	if brief == nil {
 		year, _ := this.GetInt("year")
 		month, _ := this.GetInt("month")
-		brief, success := models.GetBrief(year, month)
+		brief, success := models.GetBrief(year, month, sex)
 		if !success {
 			ReplyError(this, STATUSCODE_EXCEPTIONOCCUR, MESSAGE_EXCEPTIONOCCUR+fmt.Sprintf(""))
 			return
